@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание существ</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div id="app">
+        <!-- ========== ИГРОВОЙ РЕЖИМ ========== -->
+        <div id="game-mode" class="mode active">
+            <canvas id="gameCanvas" role="img" aria-label="Игровое поле с существами"></canvas>
+            <button id="createBtn" class="create-btn" title="Открыть редактор для создания нового существа" aria-label="Создать новое существо">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="16"/>
+                    <line x1="8" y1="12" x2="16" y2="12"/>
+                </svg>
+                Создать существо
+            </button>
+        </div>
+
+        <!-- ========== РЕДАКТОР ========== -->
+        <div id="editor-mode" class="mode">
+            <!-- Верхняя панель -->
+            <header class="editor-header" role="banner">
+                <h2>Редактор существа</h2>
+                <button id="closeEditorBtn" class="close-btn" title="Закрыть редактор и вернуться в игру" aria-label="Закрыть редактор">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </header>
+
+            <!-- Основная область редактора -->
+            <div class="editor-body" role="main">
+                <!-- ЛЕВАЯ ПАНЕЛЬ: Части тела -->
+                <nav class="editor-left" aria-label="Выбор части тела">
+                    <div class="part-icons" role="tablist" aria-label="Части тела существа">
+                        <button class="part-icon active" data-part="head" role="tab" aria-selected="true" aria-label="Редактировать голову" title="Редактировать голову">
+                            <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="currentColor"/></svg>
+                            <span>Голова</span>
+                        </button>
+                        <button class="part-icon" data-part="body" role="tab" aria-selected="false" aria-label="Редактировать туловище" title="Редактировать туловище">
+                            <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="10" y="10" width="20" height="25" rx="4" fill="currentColor"/></svg>
+                            <span>Тело</span>
+                        </button>
+                        <button class="part-icon" data-part="arm_l" role="tab" aria-selected="false" aria-label="Редактировать левую руку" title="Редактировать левую руку">
+                            <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="8" width="8" height="22" rx="4" fill="currentColor"/></svg>
+                            <span>Рука L</span>
+                        </button>
+                        <button class="part-icon" data-part="arm_r" role="tab" aria-selected="false" aria-label="Редактировать правую руку" title="Редактировать правую руку">
+                            <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="27" y="8" width="8" height="22" rx="4" fill="currentColor"/></svg>
+                            <span>Рука R</span>
+                        </button>
+                        <button class="part-icon" data-part="leg_l" role="tab" aria-selected="false" aria-label="Редактировать левую ногу" title="Редактировать левую ногу">
+                            <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="8" y="30" width="10" height="20" rx="4" fill="currentColor"/></svg>
+                            <span>Нога L</span>
+                        </button>
+                        <button class="part-icon" data-part="leg_r" role="tab" aria-selected="false" aria-label="Редактировать правую ногу" title="Редактировать правую ногу">
+                            <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="22" y="30" width="10" height="20" rx="4" fill="currentColor"/></svg>
+                            <span>Нога R</span>
+                        </button>
+                        <button class="part-icon" data-part="eye" role="tab" aria-selected="false" aria-label="Редактировать глаза" title="Редактировать глаза">
+                            <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="14" cy="16" r="4" fill="currentColor"/><circle cx="26" cy="16" r="4" fill="currentColor"/></svg>
+                            <span>Глаза</span>
+                        </button>
+                        <button class="part-icon" data-part="mouth" role="tab" aria-selected="false" aria-label="Редактировать рот" title="Редактировать рот">
+                            <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M12 22 Q20 30 28 22" stroke="currentColor" stroke-width="3" fill="none"/></svg>
+                            <span>Рот</span>
+                        </button>
+                        <button class="part-icon" data-part="hair" role="tab" aria-selected="false" aria-label="Редактировать волосы" title="Редактировать волосы">
+                            <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 16 Q20 4 32 16" stroke="currentColor" stroke-width="3" fill="none"/><path d="M8 16 Q12 8 16 12" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                            <span>Волосы</span>
+                        </button>
+                        <button class="part-icon" data-part="clothes" role="tab" aria-selected="false" aria-label="Редактировать одежду" title="Редактировать одежду">
+                            <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="8" y="14" width="24" height="18" rx="3" fill="currentColor"/><path d="M12 14 L20 8 L28 14" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                            <span>Одежда</span>
+                        </button>
+                    </div>
+                </nav>
+
+                <!-- ЦЕНТР: Холст -->
+                <div class="editor-center">
+                    <div class="canvas-wrapper">
+                        <canvas id="editorCanvas" width="400" height="500" role="img" aria-label="Холст для рисования персонажа"></canvas>
+                        <div class="canvas-controls">
+                            <label class="toggle-label" title="Показать сетку на холсте">
+                                <input type="checkbox" id="gridToggle" checked aria-label="Показать сетку">
+                                <span>Сетка</span>
+                            </label>
+                            <label class="toggle-label" title="Показать силуэт человека для ориентира">
+                                <input type="checkbox" id="silhouetteToggle" checked aria-label="Показать силуэт">
+                                <span>Силуэт</span>
+                            </label>
+                            <button id="undoBtn" class="ctrl-btn" title="Отменить последнее действие" aria-label="Отменить">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M3 7v6h6"/>
+                                    <path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/>
+                                </svg>
+                                Отмена
+                            </button>
+                            <button id="clearBtn" class="ctrl-btn" title="Очистить текущий слой" aria-label="Очистить холст">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M3 6h18"/>
+                                    <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                                </svg>
+                                Очистить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ПРАВАЯ ПАНЕЛЬ: Настройки -->
+                <div class="editor-right">
+                    <div class="settings-tabs" role="tablist" aria-label="Режимы редактирования">
+                        <button class="settings-tab active" data-tab="presets" role="tab" aria-selected="true" title="Выбрать стандартный пресет">Стандартные</button>
+                        <button class="settings-tab" data-tab="draw" role="tab" aria-selected="false" title="Нарисовать элемент вручную">Рисунок</button>
+                    </div>
+
+                    <!-- Вкладка: Стандартные пресеты -->
+                    <div class="settings-content active" id="presetsTab" role="tabpanel">
+                        <div class="preset-grid" id="presetGrid" role="list" aria-label="Список пресетов">
+                            <!-- Пресеты будут добавлены динамически -->
+                        </div>
+                        <button id="savePresetBtn" class="action-btn primary" title="Сохранить текущего персонажа как пресет">Сохранить пресет</button>
+                    </div>
+
+                    <!-- Вкладка: Рисунок -->
+                    <div class="settings-content" id="drawTab" role="tabpanel">
+                        <div class="draw-controls">
+                            <div class="color-row">
+                                <label for="colorPicker" title="Выберите цвет для рисования">Цвет</label>
+                                <input type="color" id="colorPicker" value="#b8a9c9" title="Выберите цвет" aria-label="Выбор цвета">
+                            </div>
+                            <div class="size-row">
+                                <label for="brushSize" title="Размер кисти">Размер</label>
+                                <input type="range" id="brushSize" min="1" max="20" value="4" title="Размер кисти" aria-label="Размер кисти" placeholder="Размер кисти">
+                                <span id="sizeLabel">4px</span>
+                            </div>
+                            <div class="tool-row" role="group" aria-label="Инструменты рисования">
+                                <button class="tool-btn active" data-tool="pencil" title="Рисовать карандашом" aria-label="Карандаш">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+                                        <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+                                        <path d="M2 2l7.586 7.586"/>
+                                        <circle cx="11" cy="11" r="2"/>
+                                    </svg>
+                                    Карандаш
+                                </button>
+                                <button class="tool-btn" data-tool="eraser" title="Стереть нарисованное" aria-label="Ластик">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <path d="M21 21l-9-9-9 9"/>
+                                        <path d="M12 12L3 3"/>
+                                    </svg>
+                                    Ластик
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Доп. вкладки для деталей -->
+                        <div class="detail-tabs" id="detailTabs" role="tablist" aria-label="Детали выбранной части">
+                            <!-- Динамически генерируется -->
+                        </div>
+                    </div>
+
+                    <button id="saveCreatureBtn" class="action-btn primary full" title="Сохранить существо и добавить в игру">✅ Создать существо</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="src/main.ts"></script>
+</body>
+</html>
