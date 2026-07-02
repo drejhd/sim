@@ -6,6 +6,25 @@ export interface BodyPart {
     data: ImageData | null; // пиксельные данные
 }
 
+// Добавляем новые типы
+export type BodyPartType = 'head' | 'torso' | 'shoulder_l' | 'shoulder_r' | 'forearm_l' | 'forearm_r' | 'hand_l' | 'hand_r' | 'thigh_l' | 'thigh_r' | 'calf_l' | 'calf_r' | 'foot_l' | 'foot_r';
+
+export interface BodyPartPreset {
+    id: string;
+    name: string;
+    type: BodyPartType;
+    imageData: ImageData; // или base64 строка
+    preview: string; // dataURL для отображения
+    position?: { x: number; y: number }; // смещение относительно центра
+    scale?: number; // масштаб
+}
+
+export interface CreatureBody {
+    parts: Map<BodyPartType, BodyPartPreset>;
+    skinLayer: ImageData | null; // для рисования на коже
+    selectedPart: BodyPartType | null;
+}
+
 export interface CreaturePreset {
     id: string;
     name: string;

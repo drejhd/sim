@@ -542,3 +542,468 @@ body {
         grid-template-columns: repeat(3, 1fr);
     }
 }
+
+/* Мини-холст */
+.mini-canvas-wrapper {
+    background: #fffcf9;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+#miniCanvas {
+    background: #fcf9f7;
+    border-radius: 4px;
+    border: 2px solid #e8d9d0;
+    width: 100%;
+    max-width: 150px;
+    height: auto;
+    aspect-ratio: 1;
+}
+
+.mini-label {
+    font-size: 11px;
+    color: #7a6a7a;
+    display: block;
+    margin-top: 4px;
+}
+
+/* Список частей тела */
+.body-parts-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin-top: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.body-part-selector {
+    padding: 4px 8px;
+    background: #f0e8e3;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #5a4a5a;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.body-part-selector:hover {
+    background: #e5dbd4;
+}
+
+.body-part-selector.active {
+    border-color: #b8a9c9;
+    background: #ede6f0;
+}
+
+/* Индикатор этапов */
+.stage-indicator {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 8px 0;
+    margin-bottom: 12px;
+    background: #fffcf9;
+    border-radius: 8px;
+}
+
+.stage {
+    font-size: 13px;
+    color: #b0a8b8;
+    padding: 4px 12px;
+    border-radius: 12px;
+    transition: all 0.3s;
+}
+
+.stage.active {
+    color: #5a4a5a;
+    background: #ede6f0;
+}
+
+.stage.done {
+    color: #8a7a8a;
+    text-decoration: line-through;
+}
+
+/* ========== ИНДИКАТОР ЭТАПОВ ========== */
+.stage-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #fffcf9;
+    border-bottom: 1px solid #ebe5e0;
+    flex-shrink: 0;
+}
+
+.stage {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 20px;
+    background: transparent;
+    color: #b0a8b8;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.stage:hover {
+    background: #f0e8e3;
+}
+
+.stage.active {
+    background: #ede6f0;
+    color: #5a4a5a;
+}
+
+.stage.done {
+    color: #8a7a8a;
+    text-decoration: line-through;
+}
+
+.stage-arrow {
+    color: #d4c8c0;
+    font-size: 12px;
+}
+
+/* ========== МИНИ-ХОЛСТ ========== */
+.mini-canvas-wrapper {
+    background: #fffcf9;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    margin-bottom: 10px;
+    border: 1px solid #ebe5e0;
+}
+
+#miniCanvas {
+    background: #fcf9f7;
+    border-radius: 4px;
+    border: 2px solid #e8d9d0;
+    width: 100%;
+    max-width: 150px;
+    height: auto;
+    aspect-ratio: 1;
+}
+
+.mini-label {
+    font-size: 11px;
+    color: #7a6a7a;
+    display: block;
+    margin-top: 4px;
+}
+
+/* ========== СПИСОК ЧАСТЕЙ ТЕЛА ========== */
+.body-parts-section {
+    background: #fffcf9;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ebe5e0;
+}
+
+.body-parts-section h4 {
+    font-size: 12px;
+    color: #7a6a7a;
+    margin: 0 0 8px 0;
+    font-weight: 500;
+}
+
+.body-parts-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.body-part-selector {
+    padding: 4px 8px;
+    background: #f0e8e3;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    font-size: 10px;
+    color: #5a4a5a;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.body-part-selector:hover {
+    background: #e5dbd4;
+}
+
+.body-part-selector.active {
+    border-color: #b8a9c9;
+    background: #ede6f0;
+}
+
+/* ========== НАВИГАЦИЯ ========== */
+.stage-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 0;
+    border-top: 1px solid #ebe5e0;
+    margin-bottom: 10px;
+}
+
+.nav-btn {
+    padding: 6px 16px;
+    background: #f0e8e3;
+    border: none;
+    border-radius: 6px;
+    color: #5a4a5a;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.nav-btn:hover:not(:disabled) {
+    background: #e5dbd4;
+}
+
+.nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+#stageCounter {
+    font-size: 13px;
+    color: #7a6a7a;
+}
+
+/* ========== СКРЫТИЕ ЭТАПОВ ========== */
+.stage-content {
+    display: none;
+}
+
+.stage-content.active {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Адаптация правой панели для новых элементов */
+.editor-right {
+    width: 260px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* Адаптив */
+@media (max-width: 1024px) {
+    .editor-right {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        max-height: 300px;
+    }
+    
+    .mini-canvas-wrapper,
+    .body-parts-section {
+        flex: 1;
+        min-width: 150px;
+    }
+    
+    .stage-navigation {
+        width: 100%;
+    }
+    
+    #saveCreatureBtn {
+        width: 100%;
+    }
+}
+
+/* Стили для контейнеров этапов */
+.stage-content {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    padding: 4px 0;
+}
+
+.stage-content.active {
+    display: flex;
+}
+
+/* Детали */
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.detail-category {
+    padding: 8px;
+    background: #f0e8e3;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #5a4a5a;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.detail-category:hover {
+    background: #e5dbd4;
+}
+
+.detail-category.active {
+    border-color: #b8a9c9;
+    background: #ede6f0;
+}
+
+.detail-presets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.detail-preset-item {
+    padding: 8px;
+    background: #f5f1ee;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.detail-preset-item:hover {
+    background: #f0e8e3;
+}
+
+.detail-preset-item.active {
+    border-color: #b8a9c9;
+    background: #ede6f0;
+}
+
+.detail-preset-item span {
+    font-size: 10px;
+    color: #7a6a7a;
+    display: block;
+    margin-top: 4px;
+}
+
+/* Одежда */
+.clothes-categories {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.clothes-cat {
+    padding: 8px;
+    background: #f0e8e3;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #5a4a5a;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.clothes-cat:hover {
+    background: #e5dbd4;
+}
+
+.clothes-cat.active {
+    border-color: #b8a9c9;
+    background: #ede6f0;
+}
+
+.clothes-presets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.clothes-preset-item {
+    padding: 8px;
+    background: #f5f1ee;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.clothes-preset-item:hover {
+    background: #f0e8e3;
+}
+
+.clothes-preset-item.active {
+    border-color: #b8a9c9;
+    background: #ede6f0;
+}
+
+.clothes-preset-item span {
+    font-size: 10px;
+    color: #7a6a7a;
+    display: block;
+    margin-top: 4px;
+}
+
+/* Скрытие левой панели на других этапах */
+.editor-left {
+    transition: display 0.3s ease;
+}
+
+/* Кнопка очистки кожи */
+.action-btn.secondary {
+    background: #f0e8e3;
+    color: #5a4a5a;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-btn.secondary:hover {
+    background: #e5dbd4;
+}
+
+/* ========== КАСТОМНЫЕ СКРОЛЛБАРЫ ========== */
+
+/* Для WebKit-браузеров (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f0e8e3;
+    border-radius: 15px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #d4c8c0;
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #dccbc1;
+}

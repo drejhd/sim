@@ -34,6 +34,16 @@
                 </button>
             </header>
 
+            <div class="stage-indicator">
+                    <button class="stage active" data-stage="0">❶ Тело</button>
+                    <span class="stage-arrow">→</span>
+                    <button class="stage" data-stage="1">❷ Кожа</button>
+                    <span class="stage-arrow">→</span>
+                    <button class="stage" data-stage="2">❸ Детали</button>
+                    <span class="stage-arrow">→</span>
+                    <button class="stage" data-stage="3">❹ Одежда</button>
+                </div>
+
             <!-- Основная область редактора -->
             <div class="editor-body" role="main">
                 <!-- ЛЕВАЯ ПАНЕЛЬ: Части тела -->
@@ -115,58 +125,126 @@
 
                 <!-- ПРАВАЯ ПАНЕЛЬ: Настройки -->
                 <div class="editor-right">
-                    <div class="settings-tabs" role="tablist" aria-label="Режимы редактирования">
-                        <button class="settings-tab active" data-tab="presets" role="tab" aria-selected="true" title="Выбрать стандартный пресет">Стандартные</button>
-                        <button class="settings-tab" data-tab="draw" role="tab" aria-selected="false" title="Нарисовать элемент вручную">Рисунок</button>
-                    </div>
-
-                    <!-- Вкладка: Стандартные пресеты -->
-                    <div class="settings-content active" id="presetsTab" role="tabpanel">
-                        <div class="preset-grid" id="presetGrid" role="list" aria-label="Список пресетов">
-                            <!-- Пресеты будут добавлены динамически -->
+                    <!-- Контейнер для этапа "Тело" -->
+                    <div class="stage-content active" data-stage="body">
+                        <div class="settings-tabs" role="tablist" aria-label="Режимы редактирования">
+                            <button class="settings-tab active" data-tab="presets" role="tab" aria-selected="true">Стандартные</button>
+                            <button class="settings-tab" data-tab="draw" role="tab" aria-selected="false">Рисунок</button>
                         </div>
-                        <button id="savePresetBtn" class="action-btn primary" title="Сохранить текущего персонажа как пресет">Сохранить пресет</button>
+
+                        <!-- Мини-холст -->
+                        <div class="mini-canvas-wrapper">
+                            <canvas id="miniCanvas" width="150" height="150" role="img" aria-label="Мини-холст выбранной части"></canvas>
+                            <span class="mini-label">Текущая часть: <span id="currentPartLabel">Голова</span></span>
+                        </div>
+                        
+                        <!-- Список частей тела -->
+                        <div class="body-parts-section">
+                            <h4>Части тела</h4>
+                            <div class="body-parts-list" id="bodyPartSelectors">
+                                <!-- Генерируется динамически -->
+                            </div>
+                        </div>
+
+                        <!-- Вкладка: Стандартные пресеты -->
+                        <div class="settings-content active" id="presetsTab" role="tabpanel">
+                            <div class="preset-grid" id="presetGrid" role="list">
+                                <!-- Пресеты добавляются динамически -->
+                            </div>
+                            <button id="savePresetBtn" class="action-btn primary">Сохранить пресет</button>
+                        </div>
+
+                        <!-- Вкладка: Рисунок -->
+                        <div class="settings-content" id="drawTab" role="tabpanel">
+                            <div class="draw-controls">
+                                <div class="color-row">
+                                    <label for="colorPicker">Цвет</label>
+                                    <input type="color" id="colorPicker" value="#b8a9c9">
+                                </div>
+                                <div class="size-row">
+                                    <label for="brushSize">Размер</label>
+                                    <input type="range" id="brushSize" min="1" max="20" value="4">
+                                    <span id="sizeLabel">4px</span>
+                                </div>
+                                <div class="tool-row" role="group">
+                                    <button class="tool-btn active" data-tool="pencil">Карандаш</button>
+                                    <button class="tool-btn" data-tool="eraser">Ластик</button>
+                                </div>
+                            </div>
+                            <div class="detail-tabs" id="detailTabs" role="tablist">
+                                <!-- Динамически генерируется -->
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Вкладка: Рисунок -->
-                    <div class="settings-content" id="drawTab" role="tabpanel">
+                    <!-- Контейнер для этапа "Кожа" -->
+                    <div class="stage-content" data-stage="skin" style="display:none;">
+                        <h4>Рисунок на коже</h4>
+                        <p style="font-size:13px;color:#7a6a7a;margin-bottom:12px;">Нарисуйте тату, шрамы или пятна на теле персонажа</p>
+                        
                         <div class="draw-controls">
                             <div class="color-row">
-                                <label for="colorPicker" title="Выберите цвет для рисования">Цвет</label>
-                                <input type="color" id="colorPicker" value="#b8a9c9" title="Выберите цвет" aria-label="Выбор цвета">
+                                <label for="skinColorPicker">Цвет</label>
+                                <input type="color" id="skinColorPicker" value="#c9b8a9">
                             </div>
                             <div class="size-row">
-                                <label for="brushSize" title="Размер кисти">Размер</label>
-                                <input type="range" id="brushSize" min="1" max="20" value="4" title="Размер кисти" aria-label="Размер кисти" placeholder="Размер кисти">
-                                <span id="sizeLabel">4px</span>
+                                <label for="skinBrushSize">Размер</label>
+                                <input type="range" id="skinBrushSize" min="1" max="30" value="6">
+                                <span id="skinSizeLabel">6px</span>
                             </div>
-                            <div class="tool-row" role="group" aria-label="Инструменты рисования">
-                                <button class="tool-btn active" data-tool="pencil" title="Рисовать карандашом" aria-label="Карандаш">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                        <path d="M12 19l7-7 3 3-7 7-3-3z"/>
-                                        <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
-                                        <path d="M2 2l7.586 7.586"/>
-                                        <circle cx="11" cy="11" r="2"/>
-                                    </svg>
-                                    Карандаш
-                                </button>
-                                <button class="tool-btn" data-tool="eraser" title="Стереть нарисованное" aria-label="Ластик">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                        <path d="M21 21l-9-9-9 9"/>
-                                        <path d="M12 12L3 3"/>
-                                    </svg>
-                                    Ластик
-                                </button>
+                            <div class="tool-row" role="group">
+                                <button class="tool-btn active" data-tool="pencil">Кисть</button>
+                                <button class="tool-btn" data-tool="eraser">Ластик</button>
                             </div>
                         </div>
                         
-                        <!-- Доп. вкладки для деталей -->
-                        <div class="detail-tabs" id="detailTabs" role="tablist" aria-label="Детали выбранной части">
-                            <!-- Динамически генерируется -->
+                        <button id="clearSkinBtn" class="action-btn secondary">Очистить кожу</button>
+                    </div>
+
+                    <!-- Контейнер для этапа "Детали" -->
+                    <div class="stage-content" data-stage="details" style="display:none;">
+                        <h4>Детали персонажа</h4>
+                        <p style="font-size:13px;color:#7a6a7a;margin-bottom:12px;">Добавьте глаза, рот, волосы и другие детали</p>
+                        
+                        <div class="details-grid" id="detailsGrid">
+                            <button class="detail-category active" data-detail="eyes">👀 Глаза</button>
+                            <button class="detail-category" data-detail="mouth">👄 Рот</button>
+                            <button class="detail-category" data-detail="hair">💇 Волосы</button>
+                            <button class="detail-category" data-detail="nose">👃 Нос</button>
+                            <button class="detail-category" data-detail="ears">👂 Уши</button>
+                            <button class="detail-category" data-detail="eyebrows">🤨 Брови</button>
+                        </div>
+                        
+                        <div class="detail-presets" id="detailPresets">
+                            <!-- Пресеты деталей -->
                         </div>
                     </div>
 
-                    <button id="saveCreatureBtn" class="action-btn primary full" title="Сохранить существо и добавить в игру">✅ Создать существо</button>
+                    <!-- Контейнер для этапа "Одежда" -->
+                    <div class="stage-content" data-stage="clothes" style="display:none;">
+                        <h4>Одежда и аксессуары</h4>
+                        <p style="font-size:13px;color:#7a6a7a;margin-bottom:12px;">Выберите или нарисуйте одежду для персонажа</p>
+                        
+                        <div class="clothes-categories">
+                            <button class="clothes-cat active" data-clothes="top">👕 Верх</button>
+                            <button class="clothes-cat" data-clothes="bottom">👖 Низ</button>
+                            <button class="clothes-cat" data-clothes="shoes">👟 Обувь</button>
+                            <button class="clothes-cat" data-clothes="accessories">💎 Аксессуары</button>
+                        </div>
+                        
+                        <div class="clothes-presets" id="clothesPresets">
+                            <!-- Пресеты одежды -->
+                        </div>
+                    </div>
+
+                    <!-- Навигация -->
+                    <div class="stage-navigation">
+                        <button id="prevStageBtn" class="nav-btn" disabled>◀ Назад</button>
+                        <span id="stageCounter">1 / 4</span>
+                        <button id="nextStageBtn" class="nav-btn">Далее ▶</button>
+                    </div>
+
+                    <button id="saveCreatureBtn" class="action-btn primary full">✅ Создать существо</button>
                 </div>
             </div>
         </div>

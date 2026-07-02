@@ -1,18 +1,29 @@
 import { GameField } from './game/GameField';
-import { EditorMode } from './editor/EditorMode';
+import { BodyEditor } from './editor/BodyEditor';
+import { StageManager } from './editor/StageManager';
 
 const gameMode = document.getElementById('game-mode')!;
 const editorMode = document.getElementById('editor-mode')!;
 const gameCanvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 
 const game = new GameField(gameCanvas);
-const editor = new EditorMode();
+
+// СОЗДАЕМ НОВЫЕ КОМПОНЕНТЫ ВМЕСТО EditorMode
+const bodyEditor = new BodyEditor();
+const stageManager = new StageManager((stage, index) => {
+    console.log(`📌 Этап ${index + 1}: ${stage}`);
+    const event = new CustomEvent('stageChanged', { 
+        detail: { stage, index } 
+    });
+    document.dispatchEvent(event);
+});
 
 // Открыть редактор
 document.getElementById('createBtn')?.addEventListener('click', () => {
     gameMode.classList.remove('active');
     editorMode.classList.add('active');
-    editor.init();
+    bodyEditor.init(); // Вместо editor.init()
+    stageManager.goToStage(0);
 });
 
 // Закрыть редактор
