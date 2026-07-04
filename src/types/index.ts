@@ -6,9 +6,12 @@ export interface BodyPart {
     data: ImageData | null; // пиксельные данные
 }
 
-// Добавляем новые типы
-export type BodyPartType = 'head' | 'torso' | 'shoulder_l' | 'shoulder_r' | 'forearm_l' | 'forearm_r' | 'hand_l' | 'hand_r' | 'thigh_l' | 'thigh_r' | 'calf_l' | 'calf_r' | 'foot_l' | 'foot_r';
-
+export type BodyPartType = 
+    'head' | 'torso' | 
+    'shoulder_l' | 'shoulder_r' | 'forearm_l' | 'forearm_r' | 'hand_l' | 'hand_r' |
+    'thigh_l' | 'thigh_r' | 'calf_l' | 'calf_r' | 'foot_l' | 'foot_r' |
+    'ear_l' | 'ear_r';
+    
 export interface BodyPartPreset {
     id: string;
     name: string;

@@ -12,6 +12,42 @@ export class BodyEditor {
     private skinLayer: ImageData | null = null;
     private parts: Map<BodyPartType, BodyPartPreset> = new Map();
     private currentStage: string = 'body';
+    private selectedSubcategory: string = 'head'; // для хранения выбранной подкатегории
+
+    // Категории и их детальные части
+    private categoryMap: Record<string, { 
+        title: string, 
+        subcategories?: { label: string, parts: BodyPartType[] }[],
+        parts?: BodyPartType[] 
+    }> = {
+        head: {
+            title: 'Части головы',
+            subcategories: [
+                { label: 'Голова', parts: ['head'] },
+                { label: 'Уши', parts: ['ear_l', 'ear_r'] }
+            ]
+        },
+        torso: {
+            title: 'Части тела',
+            parts: ['torso']
+        },
+        arm: {
+            title: 'Части руки',
+            subcategories: [
+                { label: 'Левая', parts: ['shoulder_l', 'forearm_l', 'hand_l'] },
+                { label: 'Правая', parts: ['shoulder_r', 'forearm_r', 'hand_r'] }
+            ]
+        },
+        leg: {
+            title: 'Части ноги',
+            subcategories: [
+                { label: 'Левая', parts: ['thigh_l', 'calf_l', 'foot_l'] },
+                { label: 'Правая', parts: ['thigh_r', 'calf_r', 'foot_r'] }
+            ]
+        }
+    };
+
+    private selectedCategory: string = 'head';
 
     constructor() {
         this.mainCanvas = document.getElementById('editorCanvas') as HTMLCanvasElement;
@@ -38,24 +74,150 @@ export class BodyEditor {
         // Обновляем UI в зависимости от этапа
         switch(stage) {
             case 'body':
-                // Показываем выбор частей тела
-                this.renderPresetPanel();
+                this.setDrawingEnabled(false);
+                this.renderBodyPartsGrid(this.selectedCategory);
                 this.renderMainCanvas();
                 break;
             case 'skin':
-                // Подготавливаем для рисования на коже
+                this.setDrawingEnabled(true);
                 this.prepareSkinDrawing();
                 break;
             case 'details':
-                // Показываем детали
+                this.setDrawingEnabled(false);
                 this.renderDetails();
                 break;
             case 'clothes':
-                // Показываем одежду
+                this.setDrawingEnabled(false);
                 this.renderClothes();
                 break;
         }
     }
+
+    private setDrawingEnabled(enabled: boolean) {
+        // Меняем курсор
+        this.mainCanvas.style.cursor = enabled ? 'crosshair' : 'default';
+        
+        // Включаем/отключаем события (через флаг)
+        this.isDrawingEnabled = enabled;
+    }
+
+    // Добавляем флаг в класс
+    private isDrawingEnabled = false;
+
+    private renderBodyPartsGrid(category: string) {
+        const grid = document.getElementById('bodyPartsGrid')!;
+        const title = document.getElementById('categoryTitle')!;
+        const tabsContainer = document.getElementById('subcategoryTabs')!;
+        const categoryData = this.categoryMap[category];
+        
+        if (!categoryData) return;
+        
+        title.textContent = categoryData.title;
+        
+        // Проверяем, есть ли подкатегории
+        const hasSubcategories = categoryData.subcategories && categoryData.subcategories.length > 0;
+        
+        if (hasSubcategories) {
+            // Показываем вкладки
+            tabsContainer.style.display = 'flex';
+            
+            // Рендерим вкладки
+            const subcategories = categoryData.subcategories!;
+            tabsContainer.innerHTML = subcategories.map((sub, index) => `
+                <button class="subcategory-tab ${index === 0 ? 'active' : ''}" 
+                        data-sub="${sub.label}">
+                    ${sub.label}
+                </button>
+            `).join('');
+            
+            // Выбираем первую подкатегорию по умолчанию
+            this.selectedSubcategory = subcategories[0].label;
+            
+            // Обработчики вкладок
+            tabsContainer.querySelectorAll('.subcategory-tab').forEach(el => {
+                el.addEventListener('click', () => {
+                    tabsContainer.querySelectorAll('.subcategory-tab').forEach(b => b.classList.remove('active'));
+                    el.classList.add('active');
+                    this.selectedSubcategory = el.getAttribute('data-sub') || '';
+                    this.renderPartsForSubcategory(category, this.selectedSubcategory);
+                });
+            });
+            
+            // Рендерим части для первой подкатегории
+            this.renderPartsForSubcategory(category, this.selectedSubcategory);
+            
+        } else {
+            // Скрываем вкладки
+            tabsContainer.style.display = 'none';
+            
+            // Используем обычные части
+            const parts = categoryData.parts || [];
+            this.renderPartsList(parts);
+        }
+    }
+
+    private renderPartsForSubcategory(category: string, subcategoryLabel: string) {
+        const categoryData = this.categoryMap[category];
+        if (!categoryData || !categoryData.subcategories) return;
+        
+        const subcategory = categoryData.subcategories.find(s => s.label === subcategoryLabel);
+        if (!subcategory) return;
+        
+        this.renderPartsList(subcategory.parts);
+        
+        // автоматически выбираем первую часть
+        if (subcategory.parts && subcategory.parts.length > 0) {
+            this.selectPart(subcategory.parts[0]);
+        }
+    }
+
+private renderPartsList(parts: BodyPartType[]) {
+    const grid = document.getElementById('bodyPartsGrid')!;
+    
+    const partNames: Record<BodyPartType, string> = {
+        head: 'Голова',
+        torso: 'Тело',
+        shoulder_l: 'Плечо',
+        shoulder_r: 'Плечо',
+        forearm_l: 'Предплечье',
+        forearm_r: 'Предплечье',
+        hand_l: 'Кисть',
+        hand_r: 'Кисть',
+        thigh_l: 'Бедро',
+        thigh_r: 'Бедро',
+        calf_l: 'Голень',
+        calf_r: 'Голень',
+        foot_l: 'Стопа',
+        foot_r: 'Стопа',
+        ear_l: 'Левое ухо',
+        ear_r: 'Правое ухо'
+    };
+    
+    if (parts.length === 0) {
+        grid.innerHTML = `<div class="empty-message">Нет доступных частей</div>`;
+        return;
+    }
+    
+    grid.innerHTML = parts.map(part => `
+        <button class="body-part-btn ${this.selectedPart === part ? 'active' : ''}" 
+                data-part="${part}">
+            ${partNames[part] || part}
+        </button>
+    `).join('');
+    
+    grid.querySelectorAll('.body-part-btn').forEach(el => {
+        el.addEventListener('click', () => {
+            const part = el.getAttribute('data-part') as BodyPartType;
+            this.selectPart(part);
+        });
+    });
+
+    if (!this.selectedPart || !parts.includes(this.selectedPart)) {
+        if (parts.length > 0) {
+            this.selectPart(parts[0]);
+        }
+    }
+}
 
     private prepareSkinDrawing() {
         // Активируем рисование на коже
@@ -183,31 +345,65 @@ export class BodyEditor {
     }
 
     public init() {
-        // Перерисовываем основное тело
         this.renderMainCanvas();
-        // Обновляем панель пресетов
-        this.renderPresetPanel();
-        // Выбираем первую часть по умолчанию
-        const firstPart = this.parts.keys().next().value;
-        if (firstPart) {
-            this.selectPart(firstPart);
-        } else {
-            // Если нет частей, выбираем голову
-            this.selectPart('head' as BodyPartType);
+        this.renderBodyPartsGrid('head');
+        const firstPart = this.categoryMap['head'];
+        if (firstPart.subcategories && firstPart.subcategories.length > 0) {
+            const firstSub = firstPart.subcategories[0];
+            if (firstSub.parts && firstSub.parts.length > 0) {
+                this.selectPart(firstSub.parts[0]);
+            }
         }
-        console.log('🔄 BodyEditor инициализирован');
+        this.setDrawingEnabled(false);
+        console.log('BodyEditor инициализирован');
     }
     
     private setupUI() {
-        // Заполняем панель пресетов
-        this.renderPresetPanel();
-        
         // Выбор части тела из списка справа
         document.querySelectorAll('.body-part-selector').forEach(el => {
             const btn = el as HTMLElement;
             btn.addEventListener('click', () => {
                 const part = btn.dataset.part as BodyPartType;
                 this.selectPart(part);
+            });
+        });
+
+        // Выбор категории (левая панель)
+        document.querySelectorAll('.part-icon').forEach(el => {
+            const btn = el as HTMLElement;
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.part-icon').forEach(b => {
+                    b.classList.remove('active');
+                    b.setAttribute('aria-selected', 'false');
+                });
+                btn.classList.add('active');
+                btn.setAttribute('aria-selected', 'true');
+                
+                const category = btn.dataset.category as string;
+                this.selectedCategory = category;
+                this.renderBodyPartsGrid(category);
+                
+                // Выбираем первую часть в категории
+                const categoryData = this.categoryMap[category];
+                if (categoryData) {
+                    let firstPart: BodyPartType | null = null;
+                    
+                    // Если есть подкатегории — берем из первой
+                    if (categoryData.subcategories && categoryData.subcategories.length > 0) {
+                        const firstSub = categoryData.subcategories[0];
+                        if (firstSub.parts && firstSub.parts.length > 0) {
+                            firstPart = firstSub.parts[0];
+                        }
+                    } 
+                    // Если есть обычные parts
+                    else if (categoryData.parts && categoryData.parts.length > 0) {
+                        firstPart = categoryData.parts[0];
+                    }
+                    
+                    if (firstPart) {
+                        this.selectPart(firstPart);
+                    }
+                }
             });
         });
         
@@ -228,50 +424,16 @@ export class BodyEditor {
         this.selectedPart = part;
         
         // Подсвечиваем выбранную часть
-        document.querySelectorAll('.body-part-selector').forEach(el => {
-            (el as HTMLElement).classList.remove('active');
+        document.querySelectorAll('.body-part-btn').forEach(el => {
+            el.classList.remove('active');
         });
-        document.querySelector(`[data-part="${part}"]`)?.classList.add('active');
-        
+        document.querySelector(`.body-part-btn[data-part="${part}"]`)?.classList.add('active');
+
         // Показываем пресеты для этой части
         this.renderPresetsForPart(part);
         
         // Обновляем мини-холст
         this.updateMiniCanvas(part);
-    }
-    
-    private renderPresetPanel() {
-        // Рендерим пресеты в правой панели
-        const container = document.getElementById('presetGrid')!;
-        const allPresets = this.presetManager.getAllPresets();
-        
-        // Инициализируем панель с частями тела
-        const partNames: { [key in BodyPartType]: string } = {
-            head: 'Голова',
-            torso: 'Тело',
-            shoulder_l: 'Плечо L',
-            shoulder_r: 'Плечо R',
-            forearm_l: 'Предплечье L',
-            forearm_r: 'Предплечье R',
-            hand_l: 'Кисть L',
-            hand_r: 'Кисть R',
-            thigh_l: 'Бедро L',
-            thigh_r: 'Бедро R',
-            calf_l: 'Голень L',
-            calf_r: 'Голень R',
-            foot_l: 'Стопа L',
-            foot_r: 'Стопа R'
-        };
-        
-        // Создаем кнопки выбора частей
-        const selectors = document.getElementById('bodyPartSelectors')!;
-        selectors.innerHTML = Object.entries(partNames).map(([key, name]) => 
-            `<button class="body-part-selector" data-part="${key}">${name}</button>`
-        ).join('');
-        
-        // Выбираем первую часть по умолчанию
-        const firstPart = Object.keys(partNames)[0] as BodyPartType;
-        this.selectPart(firstPart);
     }
     
     private renderPresetsForPart(part: BodyPartType) {
@@ -381,14 +543,14 @@ export class BodyEditor {
     
     // Методы рисования на основном холсте (с ограничением по контуру)
     private startDraw(e: MouseEvent) {
-        if (!this.selectedPart) return;
+        if (!this.isDrawingEnabled || !this.selectedPart) return;
         this.isDrawing = true;
         this.saveHistory();
         this.draw(e);
     }
     
     private draw(e: MouseEvent) {
-        if (!this.isDrawing || !this.selectedPart) return;
+        if (!this.isDrawingEnabled || !this.selectedPart || !this.isDrawingEnabled) return;
         
         const rect = this.mainCanvas.getBoundingClientRect();
         const x = (e.clientX - rect.left) * (this.mainCanvas.width / rect.width);
@@ -411,6 +573,7 @@ export class BodyEditor {
     }
     
     private endDraw() {
+        if (this.currentStage === 'body') return;
         this.isDrawing = false;
     }
     

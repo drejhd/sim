@@ -31,9 +31,13 @@ export class PresetManager {
     }
     
     private createDemoPresets() {
-        // Создаем тестовые пресеты на canvas
-        const types: BodyPartType[] = ['head', 'torso', 'shoulder_l', 'shoulder_r', 'forearm_l', 'forearm_r', 'hand_l', 'hand_r', 'thigh_l', 'thigh_r', 'calf_l', 'calf_r', 'foot_l', 'foot_r'];
-        
+        const types: BodyPartType[] = [
+            'head', 'torso', 
+            'shoulder_l', 'shoulder_r', 'forearm_l', 'forearm_r', 'hand_l', 'hand_r',
+            'thigh_l', 'thigh_r', 'calf_l', 'calf_r', 'foot_l', 'foot_r',
+            'ear_l', 'ear_r'
+        ];
+    
         types.forEach(type => {
             const presets = this.generateDemoPreset(type);
             this.presets.set(type, presets);
@@ -72,7 +76,6 @@ export class PresetManager {
     }
     
     private drawBodyPart(ctx: CanvasRenderingContext2D, type: BodyPartType, variant: number) {
-        // Временная заглушка - рисуем разные формы
         const w = ctx.canvas.width;
         const h = ctx.canvas.height;
         
@@ -81,6 +84,11 @@ export class PresetManager {
             ctx.arc(w/2, h/2 - 20, 40 + variant * 5, 0, Math.PI * 2);
         } else if (type === 'torso') {
             ctx.roundRect(w/2 - 20 - variant * 3, 10, 40 + variant * 6, 80, 10);
+        } else if (type === 'ear_l' || type === 'ear_r') {
+            // НОВОЕ: рисуем уши
+            const isLeft = type === 'ear_l';
+            const x = isLeft ? 10 : w - 10;
+            ctx.ellipse(x, h/2 - 30, 12 + variant * 2, 18 + variant * 2, 0, 0, Math.PI * 2);
         } else if (type.includes('shoulder')) {
             ctx.roundRect(0, 0, 40, 30, 5);
         } else if (type.includes('forearm')) {

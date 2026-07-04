@@ -549,7 +549,12 @@ body {
     border-radius: 8px;
     padding: 10px;
     text-align: center;
+    display: block;
     margin-bottom: 12px;
+}
+
+.stage-body .mini-canvas-wrapper {
+    display: none !important;
 }
 
 #miniCanvas {
@@ -1006,4 +1011,216 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #dccbc1;
+}
+
+/* Сетка детальных частей тела */
+.body-parts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.body-part-btn {
+    padding: 8px 6px;
+    background: #f0e8e3;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    font-size: 11px;
+    color: #5a4a5a;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.body-part-btn:hover {
+    background: #e5dbd4;
+}
+
+.body-part-btn.active {
+    border-color: #b8a9c9;
+    background: #ede6f0;
+}
+
+/* Секция пресетов */
+.presets-section {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.presets-section h4 {
+    font-size: 12px;
+    color: #7a6a7a;
+    margin: 0 0 8px 0;
+    font-weight: 500;
+}
+
+/* Пустое сообщение */
+.empty-message {
+    color: #b0a8b8;
+    font-size: 13px;
+    text-align: center;
+    padding: 20px;
+    grid-column: 1 / -1;
+}
+
+/* Скрываем старый список */
+.body-parts-list {
+    display: none;
+}
+
+/* Настройки для правой панели на этапе "Тело" */
+.stage-content[data-stage="body"] .settings-tabs {
+    display: none;
+}
+
+.stage-content[data-stage="body"] .mini-canvas-wrapper {
+    display: none !important;
+}
+
+/* Адаптация сетки пресетов */
+.preset-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+/* Сетка детальных частей тела */
+.body-parts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.body-part-btn {
+    padding: 8px 6px;
+    background: #f0e8e3;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    font-size: 11px;
+    color: #5a4a5a;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.body-part-btn:hover {
+    background: #e5dbd4;
+}
+
+.body-part-btn.active {
+    border-color: #b8a9c9;
+    background: #ede6f0;
+}
+
+/* Секция пресетов */
+.presets-section {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.presets-section h4 {
+    font-size: 12px;
+    color: #7a6a7a;
+    margin: 0 0 8px 0;
+    font-weight: 500;
+}
+
+/* Пустое сообщение */
+.empty-message {
+    color: #b0a8b8;
+    font-size: 13px;
+    text-align: center;
+    padding: 20px;
+    grid-column: 1 / -1;
+}
+
+/* BodyEditor панель */
+.body-editor-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+    min-height: 0;
+}
+
+.body-editor-panel h4 {
+    font-size: 13px;
+    color: #5a4a5a;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Скрываем старый список */
+.body-parts-list {
+    display: none;
+}
+
+/* Мини-холст */
+.mini-canvas-wrapper {
+    background: #fffcf9;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    margin-bottom: 10px;
+    border: 1px solid #ebe5e0;
+}
+
+#miniCanvas {
+    background: #fcf9f7;
+    border-radius: 4px;
+    border: 2px solid #e8d9d0;
+    width: 100%;
+    max-width: 150px;
+    height: auto;
+    aspect-ratio: 1;
+}
+
+.mini-label {
+    font-size: 11px;
+    color: #7a6a7a;
+    display: block;
+    margin-top: 4px;
+}
+
+/* Вкладки подкатегорий (Левая/Правая для рук и ног) */
+.subcategory-tabs {
+    display: none;
+    gap: 6px;
+    margin-bottom: 8px;
+    padding: 4px;
+    background: #f0e8e3;
+    border-radius: 8px;
+}
+
+.subcategory-tab {
+    flex: 1;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #7a6a7a;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.subcategory-tab:hover {
+    background: #e5dbd4;
+}
+
+.subcategory-tab.active {
+    background: #fffcf9;
+    color: #5a4a5a;
+    box-shadow: 0 2px 8px rgba(90, 74, 90, 0.08);
 }

@@ -49,45 +49,21 @@
                 <!-- ЛЕВАЯ ПАНЕЛЬ: Части тела -->
                 <nav class="editor-left" aria-label="Выбор части тела">
                     <div class="part-icons" role="tablist" aria-label="Части тела существа">
-                        <button class="part-icon active" data-part="head" role="tab" aria-selected="true" aria-label="Редактировать голову" title="Редактировать голову">
+                        <button class="part-icon active" data-category="head" role="tab" aria-selected="true" aria-label="Редактировать голову" title="Редактировать голову">
                             <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="currentColor"/></svg>
                             <span>Голова</span>
                         </button>
-                        <button class="part-icon" data-part="body" role="tab" aria-selected="false" aria-label="Редактировать туловище" title="Редактировать туловище">
+                        <button class="part-icon" data-category="torso" role="tab" aria-selected="false" aria-label="Редактировать туловище" title="Редактировать туловище">
                             <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="10" y="10" width="20" height="25" rx="4" fill="currentColor"/></svg>
                             <span>Тело</span>
                         </button>
-                        <button class="part-icon" data-part="arm_l" role="tab" aria-selected="false" aria-label="Редактировать левую руку" title="Редактировать левую руку">
-                            <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="8" width="8" height="22" rx="4" fill="currentColor"/></svg>
-                            <span>Рука L</span>
+                        <button class="part-icon" data-category="arm" role="tab" aria-selected="false" aria-label="Редактировать руки" title="Редактировать руки">
+                            <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="8" width="8" height="22" rx="4" fill="currentColor"/><rect x="27" y="8" width="8" height="22" rx="4" fill="currentColor"/></svg>
+                            <span>Рука</span>
                         </button>
-                        <button class="part-icon" data-part="arm_r" role="tab" aria-selected="false" aria-label="Редактировать правую руку" title="Редактировать правую руку">
-                            <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="27" y="8" width="8" height="22" rx="4" fill="currentColor"/></svg>
-                            <span>Рука R</span>
-                        </button>
-                        <button class="part-icon" data-part="leg_l" role="tab" aria-selected="false" aria-label="Редактировать левую ногу" title="Редактировать левую ногу">
-                            <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="8" y="30" width="10" height="20" rx="4" fill="currentColor"/></svg>
-                            <span>Нога L</span>
-                        </button>
-                        <button class="part-icon" data-part="leg_r" role="tab" aria-selected="false" aria-label="Редактировать правую ногу" title="Редактировать правую ногу">
-                            <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="22" y="30" width="10" height="20" rx="4" fill="currentColor"/></svg>
-                            <span>Нога R</span>
-                        </button>
-                        <button class="part-icon" data-part="eye" role="tab" aria-selected="false" aria-label="Редактировать глаза" title="Редактировать глаза">
-                            <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="14" cy="16" r="4" fill="currentColor"/><circle cx="26" cy="16" r="4" fill="currentColor"/></svg>
-                            <span>Глаза</span>
-                        </button>
-                        <button class="part-icon" data-part="mouth" role="tab" aria-selected="false" aria-label="Редактировать рот" title="Редактировать рот">
-                            <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M12 22 Q20 30 28 22" stroke="currentColor" stroke-width="3" fill="none"/></svg>
-                            <span>Рот</span>
-                        </button>
-                        <button class="part-icon" data-part="hair" role="tab" aria-selected="false" aria-label="Редактировать волосы" title="Редактировать волосы">
-                            <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 16 Q20 4 32 16" stroke="currentColor" stroke-width="3" fill="none"/><path d="M8 16 Q12 8 16 12" stroke="currentColor" stroke-width="2" fill="none"/></svg>
-                            <span>Волосы</span>
-                        </button>
-                        <button class="part-icon" data-part="clothes" role="tab" aria-selected="false" aria-label="Редактировать одежду" title="Редактировать одежду">
-                            <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="8" y="14" width="24" height="18" rx="3" fill="currentColor"/><path d="M12 14 L20 8 L28 14" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-                            <span>Одежда</span>
+                        <button class="part-icon" data-category="leg" role="tab" aria-selected="false" aria-label="Редактировать ноги" title="Редактировать ноги">
+                            <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="8" y="30" width="10" height="20" rx="4" fill="currentColor"/><rect x="22" y="30" width="10" height="20" rx="4" fill="currentColor"/></svg>
+                            <span>Нога</span>
                         </button>
                     </div>
                 </nav>
@@ -127,52 +103,25 @@
                 <div class="editor-right">
                     <!-- Контейнер для этапа "Тело" -->
                     <div class="stage-content active" data-stage="body">
-                        <div class="settings-tabs" role="tablist" aria-label="Режимы редактирования">
-                            <button class="settings-tab active" data-tab="presets" role="tab" aria-selected="true">Стандартные</button>
-                            <button class="settings-tab" data-tab="draw" role="tab" aria-selected="false">Рисунок</button>
-                        </div>
-
-                        <!-- Мини-холст -->
-                        <div class="mini-canvas-wrapper">
-                            <canvas id="miniCanvas" width="150" height="150" role="img" aria-label="Мини-холст выбранной части"></canvas>
-                            <span class="mini-label">Текущая часть: <span id="currentPartLabel">Голова</span></span>
-                        </div>
-                        
-                        <!-- Список частей тела -->
-                        <div class="body-parts-section">
-                            <h4>Части тела</h4>
-                            <div class="body-parts-list" id="bodyPartSelectors">
+                        <div class="body-editor-panel">
+                            <h4 id="categoryTitle">Части головы</h4>
+                            
+                            <div class="subcategory-tabs" id="subcategoryTabs" style="display:none;">
                                 <!-- Генерируется динамически -->
                             </div>
-                        </div>
 
-                        <!-- Вкладка: Стандартные пресеты -->
-                        <div class="settings-content active" id="presetsTab" role="tabpanel">
-                            <div class="preset-grid" id="presetGrid" role="list">
-                                <!-- Пресеты добавляются динамически -->
+                            <!-- Сетка детальных частей -->
+                            <div class="body-parts-grid" id="bodyPartsGrid">
+                                <!-- Генерируется динамически -->
                             </div>
-                            <button id="savePresetBtn" class="action-btn primary">Сохранить пресет</button>
-                        </div>
-
-                        <!-- Вкладка: Рисунок -->
-                        <div class="settings-content" id="drawTab" role="tabpanel">
-                            <div class="draw-controls">
-                                <div class="color-row">
-                                    <label for="colorPicker">Цвет</label>
-                                    <input type="color" id="colorPicker" value="#b8a9c9">
+                            
+                            <!-- Пресеты -->
+                            <div class="presets-section">
+                                <h4>Пресеты</h4>
+                                <div class="preset-grid" id="presetGrid" role="list">
+                                    <!-- Пресеты добавляются динамически -->
                                 </div>
-                                <div class="size-row">
-                                    <label for="brushSize">Размер</label>
-                                    <input type="range" id="brushSize" min="1" max="20" value="4">
-                                    <span id="sizeLabel">4px</span>
-                                </div>
-                                <div class="tool-row" role="group">
-                                    <button class="tool-btn active" data-tool="pencil">Карандаш</button>
-                                    <button class="tool-btn" data-tool="eraser">Ластик</button>
-                                </div>
-                            </div>
-                            <div class="detail-tabs" id="detailTabs" role="tablist">
-                                <!-- Динамически генерируется -->
+                                <button id="savePresetBtn" class="action-btn primary">Сохранить пресет</button>
                             </div>
                         </div>
                     </div>
@@ -182,6 +131,12 @@
                         <h4>Рисунок на коже</h4>
                         <p style="font-size:13px;color:#7a6a7a;margin-bottom:12px;">Нарисуйте тату, шрамы или пятна на теле персонажа</p>
                         
+                        <!-- НОВОЕ: Мини-холст для этапа "Кожа" -->
+                        <div class="mini-canvas-wrapper">
+                            <canvas id="miniCanvas" width="150" height="150" role="img" aria-label="Мини-холст выбранной части"></canvas>
+                            <span class="mini-label">Текущая часть: <span id="currentPartLabel">Голова</span></span>
+                        </div>
+
                         <div class="draw-controls">
                             <div class="color-row">
                                 <label for="skinColorPicker">Цвет</label>
