@@ -79,7 +79,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 32px;
+    padding: 4px 32px;
     background: #fffcf9;
     border-bottom: 1px solid #ebe5e0;
     flex-shrink: 0;
@@ -182,7 +182,6 @@ body {
 .canvas-wrapper {
     background: #fffcf9;
     border-radius: 16px;
-    padding: 20px;
     box-shadow: 0 2px 16px rgba(90, 74, 90, 0.06);
     display: flex;
     flex-direction: column;
@@ -203,7 +202,7 @@ body {
 .canvas-controls {
     display: flex;
     gap: 14px;
-    margin-top: 14px;
+    margin: 5px;
     align-items: center;
     flex-wrap: wrap;
     justify-content: center;
@@ -610,7 +609,7 @@ body {
     display: flex;
     justify-content: center;
     gap: 20px;
-    padding: 8px 0;
+    padding: 2px 0;
     margin-bottom: 12px;
     background: #fffcf9;
     border-radius: 8px;
@@ -1223,4 +1222,20 @@ body {
     background: #fffcf9;
     color: #5a4a5a;
     box-shadow: 0 2px 8px rgba(90, 74, 90, 0.08);
+}
+
+.viewport-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    background: #f5f1ee;
+    border-radius: 8px;
+}
+
+#zoomLevel {
+    font-size: 13px;
+    color: #5a4a5a;
+    min-width: 50px;
+    text-align: center;
 }

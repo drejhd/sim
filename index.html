@@ -73,14 +73,12 @@
                     <div class="canvas-wrapper">
                         <canvas id="editorCanvas" width="400" height="500" role="img" aria-label="Холст для рисования персонажа"></canvas>
                         <div class="canvas-controls">
-                            <label class="toggle-label" title="Показать сетку на холсте">
-                                <input type="checkbox" id="gridToggle" checked aria-label="Показать сетку">
-                                <span>Сетка</span>
-                            </label>
-                            <label class="toggle-label" title="Показать силуэт человека для ориентира">
-                                <input type="checkbox" id="silhouetteToggle" checked aria-label="Показать силуэт">
-                                <span>Силуэт</span>
-                            </label>
+                            <div class="viewport-controls">
+                                <button id="zoomInBtn" class="ctrl-btn" title="Приблизить">🔍+</button>
+                                <span id="zoomLevel">100%</span>
+                                <button id="zoomOutBtn" class="ctrl-btn" title="Отдалить">🔍−</button>
+                                <button id="resetViewBtn" class="ctrl-btn" title="Сбросить вид">⟲</button>
+                            </div>
                             <button id="undoBtn" class="ctrl-btn" title="Отменить последнее действие" aria-label="Отменить">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <path d="M3 7v6h6"/>
@@ -121,7 +119,6 @@
                                 <div class="preset-grid" id="presetGrid" role="list">
                                     <!-- Пресеты добавляются динамически -->
                                 </div>
-                                <button id="savePresetBtn" class="action-btn primary">Сохранить пресет</button>
                             </div>
                         </div>
                     </div>
@@ -199,7 +196,7 @@
                         <button id="nextStageBtn" class="nav-btn">Далее ▶</button>
                     </div>
 
-                    <button id="saveCreatureBtn" class="action-btn primary full">✅ Создать существо</button>
+                    <button id="saveCreatureBtn" class="action-btn primary full">Создать существо</button>
                 </div>
             </div>
         </div>

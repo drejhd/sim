@@ -18,8 +18,13 @@ export interface BodyPartPreset {
     type: BodyPartType;
     imageData: ImageData; // или base64 строка
     preview: string; // dataURL для отображения
-    position?: { x: number; y: number }; // смещение относительно центра
+    position?: { x: number; y: number };
     scale?: number; // масштаб
+    meta: {
+        anchor: { x: number, y: number };  // точка привязки (0-1) относительно спрайта
+        size: { width: number, height: number }; // реальный размер части в игровых единицах
+        scale: number; // базовый масштаб (1 = нормальный)
+    };
 }
 
 export interface CreatureBody {

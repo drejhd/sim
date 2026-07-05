@@ -1,18 +1,78 @@
 import { BodyPartType, BodyPartPreset } from '../types';
 import { PresetManager } from './PresetManager';
+import { PART_CONFIGS, PartConfig } from './PartConfig';
 
 export class BodyEditor {
     private mainCanvas: HTMLCanvasElement;
     private mainCtx: CanvasRenderingContext2D;
     private miniCanvas: HTMLCanvasElement;
     private miniCtx: CanvasRenderingContext2D;
+
     private presetManager: PresetManager;
-    private selectedPart: BodyPartType | null = null;
+    
     private isDrawing = false;
+    private isRendering = false;
+    private pendingRender = false;
+
+    private selectedPart: BodyPartType | null = null;
     private skinLayer: ImageData | null = null;
     private parts: Map<BodyPartType, BodyPartPreset> = new Map();
     private currentStage: string = 'body';
     private selectedSubcategory: string = 'head'; // для хранения выбранной подкатегории
+    private selectedPresetId: string | null = null;
+
+    private defaultPositions: Record<BodyPartType, { x: number, y: number }> = {
+        head: { x: 0, y: -50 },
+        ear_l: { x: -25, y: -45 },
+        ear_r: { x: 25, y: -45 },
+        torso: { x: 0, y: 10 },
+        shoulder_l: { x: -30, y: -5 },
+        shoulder_r: { x: 30, y: -5 },
+        forearm_l: { x: -40, y: 20 },
+        forearm_r: { x: 40, y: 20 },
+        hand_l: { x: -45, y: 45 },
+        hand_r: { x: 45, y: 45 },
+        thigh_l: { x: -15, y: 45 },
+        thigh_r: { x: 15, y: 45 },
+        calf_l: { x: -15, y: 75 },
+        calf_r: { x: 15, y: 75 },
+        foot_l: { x: -20, y: 105 },
+        foot_r: { x: 20, y: 105 }
+    };
+
+    // Система координат и масштаба
+    private viewport = {
+        scale: 1.0,           // текущий масштаб
+        minScale: 0.5,
+        maxScale: 3.0,
+        offsetX: 0,           // смещение по X (для панорамирования)
+        offsetY: 0,
+        centerX: 200,         // центр холста (400/2)
+        centerY: 250          // центр холста (500/2)
+    };
+
+    // Размеры персонажа в игровых единицах (не пикселях)
+    private creatureSize = {
+        width: 100,           // базовая ширина персонажа
+        height: 150,          // базовая высота персонажа
+        scale: 1.0            // масштаб персонажа
+    };
+
+    //Преобразует игровые координаты в экранные (с учетом масштаба и смещения)
+    private worldToScreen(worldX: number, worldY: number): { x: number, y: number } {
+        return {
+            x: (worldX * this.viewport.scale) + this.viewport.offsetX,
+            y: (worldY * this.viewport.scale) + this.viewport.offsetY
+        };
+    }
+
+    //Преобразует экранные координаты в игровые
+    private screenToWorld(screenX: number, screenY: number): { x: number, y: number } {
+        return {
+            x: (screenX - this.viewport.offsetX) / this.viewport.scale,
+            y: (screenY - this.viewport.offsetY) / this.viewport.scale
+        };
+    }
 
     // Категории и их детальные части
     private categoryMap: Record<string, { 
@@ -156,7 +216,7 @@ export class BodyEditor {
         }
     }
 
-    private renderPartsForSubcategory(category: string, subcategoryLabel: string) {
+    private async renderPartsForSubcategory(category: string, subcategoryLabel: string) {
         const categoryData = this.categoryMap[category];
         if (!categoryData || !categoryData.subcategories) return;
         
@@ -167,7 +227,7 @@ export class BodyEditor {
         
         // автоматически выбираем первую часть
         if (subcategory.parts && subcategory.parts.length > 0) {
-            this.selectPart(subcategory.parts[0]);
+            await this.selectPart(subcategory.parts[0]);
         }
     }
 
@@ -211,12 +271,6 @@ private renderPartsList(parts: BodyPartType[]) {
             this.selectPart(part);
         });
     });
-
-    if (!this.selectedPart || !parts.includes(this.selectedPart)) {
-        if (parts.length > 0) {
-            this.selectPart(parts[0]);
-        }
-    }
 }
 
     private prepareSkinDrawing() {
@@ -344,16 +398,21 @@ private renderPartsList(parts: BodyPartType[]) {
         // Здесь будет логика загрузки пресетов одежды
     }
 
-    public init() {
-        this.renderMainCanvas();
+    public async init() {
+        await this.renderMainCanvas();
         this.renderBodyPartsGrid('head');
-        const firstPart = this.categoryMap['head'];
-        if (firstPart.subcategories && firstPart.subcategories.length > 0) {
-            const firstSub = firstPart.subcategories[0];
+
+        const headData = this.categoryMap['head'];
+        if (headData.subcategories && headData.subcategories.length > 0) {
+            const firstSub = headData.subcategories[0];
             if (firstSub.parts && firstSub.parts.length > 0) {
-                this.selectPart(firstSub.parts[0]);
+                // Просто устанавливаем selectedPart без применения пресета
+                this.selectedPart = firstSub.parts[0];
+                await this.renderPresetsForPart(this.selectedPart);
+                this.updateMiniCanvas(this.selectedPart);
             }
         }
+
         this.setDrawingEnabled(false);
         console.log('BodyEditor инициализирован');
     }
@@ -371,7 +430,7 @@ private renderPartsList(parts: BodyPartType[]) {
         // Выбор категории (левая панель)
         document.querySelectorAll('.part-icon').forEach(el => {
             const btn = el as HTMLElement;
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', async () => {
                 document.querySelectorAll('.part-icon').forEach(b => {
                     b.classList.remove('active');
                     b.setAttribute('aria-selected', 'false');
@@ -401,7 +460,7 @@ private renderPartsList(parts: BodyPartType[]) {
                     }
                     
                     if (firstPart) {
-                        this.selectPart(firstPart);
+                        await this.selectPart(firstPart);
                     }
                 }
             });
@@ -418,9 +477,43 @@ private renderPartsList(parts: BodyPartType[]) {
         this.miniCanvas.addEventListener('mousemove', (e) => this.drawMini(e));
         this.miniCanvas.addEventListener('mouseup', () => this.endDraw());
         this.miniCanvas.addEventListener('mouseleave', () => this.endDraw());
+        
+        // Управление масштабом
+        document.getElementById('zoomInBtn')?.addEventListener('click', () => {
+            this.zoom(0.2);
+        });
+        document.getElementById('zoomOutBtn')?.addEventListener('click', () => {
+            this.zoom(-0.2);
+        });
+        document.getElementById('resetViewBtn')?.addEventListener('click', () => {
+            this.resetView();
+        });
+        // Колесо мыши для масштаба
+        this.mainCanvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            this.zoom(delta);
+        });
+    }
+
+    private zoom(delta: number) {
+        this.viewport.scale = Math.max(
+            this.viewport.minScale, 
+            Math.min(this.viewport.maxScale, this.viewport.scale + delta)
+        );
+        document.getElementById('zoomLevel')!.textContent = `${Math.round(this.viewport.scale * 100)}%`;
+        this.renderMainCanvas();
+    }
+
+    private resetView() {
+        this.viewport.scale = 1.0;
+        this.viewport.offsetX = 0;
+        this.viewport.offsetY = 0;
+        document.getElementById('zoomLevel')!.textContent = '100%';
+        this.renderMainCanvas();
     }
     
-    private selectPart(part: BodyPartType) {
+    private async selectPart(part: BodyPartType) {
         this.selectedPart = part;
         
         // Подсвечиваем выбранную часть
@@ -436,12 +529,18 @@ private renderPartsList(parts: BodyPartType[]) {
         this.updateMiniCanvas(part);
     }
     
-    private renderPresetsForPart(part: BodyPartType) {
+    private async renderPresetsForPart(part: BodyPartType) {
         const container = document.getElementById('presetGrid')!;
-        const presets = this.presetManager.getPresets(part);
-        
+        const presets: BodyPartPreset[] = await this.presetManager.getPresets(part);
+
+        if (presets.length === 0) {
+            container.innerHTML = `<div class="empty-message">Нет пресетов для этой части тела!</div>`;
+            return;
+        }    
+
         container.innerHTML = presets.map(p => `
-            <div class="preset-item" data-preset="${p.id}">
+            <div class="preset-item ${this.selectedPresetId === p.id ? 'active' : ''}" 
+                data-preset="${p.id}">
                 <img src="${p.preview}" alt="${p.name}">
                 <span>${p.name}</span>
             </div>
@@ -453,75 +552,200 @@ private renderPartsList(parts: BodyPartType[]) {
                 const id = el.getAttribute('data-preset');
                 const preset = presets.find(p => p.id === id);
                 if (preset) {
+                    // Проверяем, не применен ли уже этот пресет
+                    const existing = this.parts.get(part);
+                    if (existing && existing.id === preset.id) {
+                        console.log('Пресет уже применен');
+                        return;
+                    }
+                    this.selectedPresetId = preset.id;
                     this.applyPreset(preset);
+                    // Обновляем выделение
+                    container.querySelectorAll('.preset-item').forEach(e => e.classList.remove('active'));
+                    el.classList.add('active');
                 }
             });
         });
     }
     
     private applyPreset(preset: BodyPartPreset) {
-        // Применяем пресет к выбранной части
-        this.parts.set(preset.type, preset);
+        // Проверяем, есть ли уже такая часть
+        const existing = this.parts.get(preset.type);
+        
+        // Если уже есть такая же часть с таким же ID — ничего не делаем
+        if (existing && existing.id === preset.id) {
+            return;
+        }
+        
+        // Если есть часть другого типа с таким же ID — тоже пропускаем
+        // (это может быть из-за того, что пресет уже был применен)
+        for (const [type, part] of this.parts) {
+            if (part.id === preset.id && type !== preset.type) {
+                console.warn(`Пресет ${preset.id} уже применен к другой части (${type})`);
+                return;
+            }
+        }
+        
+        // Сохраняем позицию если она уже была
+        const position = existing?.position || this.defaultPositions[preset.type] || { x: 0, y: 0 };
+        
+        this.parts.set(preset.type, {
+            ...preset,
+            position: position
+        });
+        
+        // Обновляем selectedPresetId
+        this.selectedPresetId = preset.id;
+        
         this.renderMainCanvas();
     }
     
-    private initDefaultBody() {
-        // Создаем тело по умолчанию с базовыми пресетами
-        const types: BodyPartType[] = ['head', 'torso', 'shoulder_l', 'shoulder_r', 'forearm_l', 'forearm_r', 'hand_l', 'hand_r', 'thigh_l', 'thigh_r', 'calf_l', 'calf_r', 'foot_l', 'foot_r'];
+    private async initDefaultBody() {
+        this.parts.clear();
+        this.selectedPresetId = null;
+        const types: BodyPartType[] = [
+            'head', 'torso', 
+            'shoulder_l', 'shoulder_r', 'forearm_l', 'forearm_r', 
+            'hand_l', 'hand_r', 'thigh_l', 'thigh_r', 
+            'calf_l', 'calf_r', 'foot_l', 'foot_r',
+            'ear_l', 'ear_r'
+        ];
         
-        types.forEach(type => {
-            const presets = this.presetManager.getPresets(type);
+        for (const type of types) {
+            const presets = await this.presetManager.getPresets(type);
             if (presets.length > 0) {
-                this.parts.set(type, presets[0]);
+                const position = this.defaultPositions[type] || { x: 0, y: 0 };
+                this.parts.set(type, {
+                    ...presets[0],
+                    position: position
+                });
             }
-        });
+        }
         
         this.renderMainCanvas();
     }
     
     private renderMainCanvas() {
-        const ctx = this.mainCtx;
-        ctx.clearRect(0, 0, this.mainCanvas.width, this.mainCanvas.height);
-        
-        // Рисуем все части тела
-        const drawOrder: BodyPartType[] = [
-            'shoulder_l', 'shoulder_r', 'forearm_l', 'forearm_r', 'hand_l', 'hand_r',
-            'thigh_l', 'thigh_r', 'calf_l', 'calf_r', 'foot_l', 'foot_r',
-            'torso', 'head'
-        ];
-        
-        drawOrder.forEach(type => {
-            const part = this.parts.get(type);
-            if (part && part.imageData) {
-                // Временное решение - рисуем из ImageData
-                this.drawImageData(ctx, part.imageData, 0, 0);
-            }
-        });
-        
-        // Рисуем слой кожи (тату, пятна) поверх тела
-        if (this.skinLayer) {
-            this.mainCtx.putImageData(this.skinLayer, 0, 0);
+        if (this.isRendering) {
+            this.pendingRender = true;
+            return;
         }
         
-        // Рисуем подсветку выбранной части
-        if (this.selectedPart) {
-            const selected = this.parts.get(this.selectedPart);
-            if (selected) {
-                ctx.strokeStyle = 'rgba(233, 69, 96, 0.5)';
-                ctx.lineWidth = 3;
-                ctx.strokeRect(0, 0, this.mainCanvas.width, this.mainCanvas.height);
+        this.isRendering = true;
+        
+        try {
+            const ctx = this.mainCtx;
+            ctx.clearRect(0, 0, this.mainCanvas.width, this.mainCanvas.height);
+            
+            // Сортируем по слоям (глубине)
+            const drawOrder: BodyPartType[] = [
+                'shoulder_l', 'shoulder_r', 'forearm_l', 'forearm_r', 'hand_l', 'hand_r',
+                'thigh_l', 'thigh_r', 'calf_l', 'calf_r', 'foot_l', 'foot_r',
+                'torso', 'head', 'ear_l', 'ear_r'
+            ];
+            
+            const centerX = this.mainCanvas.width / 2;
+            const centerY = this.mainCanvas.height / 2;
+            
+            // Отслеживаем уже нарисованные части по ID
+            const drawnIds = new Set<string>();
+            
+            drawOrder.forEach(type => {
+                const part = this.parts.get(type);
+                if (part && part.imageData) {
+                    // Проверяем, не рисовали ли мы уже эту часть
+                    if (drawnIds.has(part.id)) {
+                        console.warn(`Дублирование части: ${part.id} (${type})`);
+                        return;
+                    }
+                    drawnIds.add(part.id);
+                    
+                    const config = PART_CONFIGS[type];
+                    const pos = this.calculatePartPosition(type);
+                    
+                    this.drawPartWithAnchor(
+                        ctx, 
+                        part.imageData, 
+                        centerX + pos.x, 
+                        centerY + pos.y,
+                        config
+                    );
+                }
+            });
+        } finally {
+            this.isRendering = false;
+            
+            // Если был запланирован повторный рендер — выполняем его
+            if (this.pendingRender) {
+                this.pendingRender = false;
+                this.renderMainCanvas();
             }
         }
     }
     
-    private drawImageData(ctx: CanvasRenderingContext2D, imageData: ImageData, x: number, y: number) {
-        // Временный canvas для преобразования ImageData в изображение
+    private drawPartWithAnchor(
+        ctx: CanvasRenderingContext2D, 
+        imageData: ImageData, 
+        x: number, 
+        y: number,
+        config: PartConfig
+    ) {
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = imageData.width;
         tempCanvas.height = imageData.height;
         const tempCtx = tempCanvas.getContext('2d')!;
         tempCtx.putImageData(imageData, 0, 0);
-        ctx.drawImage(tempCanvas, x, y);
+        
+        // Размер в пикселях
+        const size = 128; // размер спрайта
+        const scale = 1; // можно менять
+        
+        // Точка привязки (в пикселях относительно спрайта)
+        const anchorX = config.anchor.x * size;
+        const anchorY = config.anchor.y * size;
+        
+        // Рисуем так, чтобы точка привязки оказалась в (x, y)
+        const drawX = x - anchorX * scale;
+        const drawY = y - anchorY * scale;
+        const drawSize = size * scale;
+        
+        ctx.drawImage(tempCanvas, drawX, drawY, drawSize, drawSize);
+    }
+    
+    private drawImageData(ctx: CanvasRenderingContext2D, imageData: ImageData, x: number, y: number) {
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = imageData.width;
+        tempCanvas.height = imageData.height;
+        const tempCtx = tempCanvas.getContext('2d')!;
+        tempCtx.putImageData(imageData, 0, 0);
+        
+        // Преобразуем координаты
+        const screenPos = this.worldToScreen(x, y);
+        
+        // Рисуем с учетом масштаба
+        const scale = this.viewport.scale * this.creatureSize.scale;
+        const scaledWidth = imageData.width * scale;
+        const scaledHeight = imageData.height * scale;
+        
+        ctx.drawImage(tempCanvas, screenPos.x, screenPos.y, scaledWidth, scaledHeight);
+    }
+
+    private calculatePartPosition(type: BodyPartType): { x: number, y: number } {
+        const config = PART_CONFIGS[type];
+        if (!config || !config.attachTo) {
+            // Базовая часть — в центре
+            return { x: 0, y: 0 };
+        }
+        
+        // Получаем позицию родительской части
+        const parentPart = this.parts.get(config.attachTo);
+        if (!parentPart) {
+            return config.attachOffset || { x: 0, y: 0 };
+        }
+        
+        // Здесь можно добавить вычисление позиции на основе размера родителя
+        // Но пока просто возвращаем offset
+        return config.attachOffset || { x: 0, y: 0 };
     }
     
     private updateMiniCanvas(part: BodyPartType) {
